@@ -2,17 +2,13 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
-
-
-<div class="container-fluid"><h1>Upcoming Concerts:</h1>
-
+<div class="container-fluid"><h1>{{search}} is performing in:</h1>
     <form method="POST" action="/concert">
         <p>Search for Concerts Performed by: 
-        <input type="text" name="search"> 
-        <input type="submit" value="Search">
+            <input type="text" name="search"> 
+            <input type="submit" value="Search">
         </p>
     </form>
-
 </div>
 
 <div class="col-sm-8 text-left">
