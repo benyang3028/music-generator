@@ -1,4 +1,3 @@
-
 """
 Columbia's COMS W4111.001 Introduction to Databases
 Example Webserver
@@ -17,7 +16,7 @@ from flask import Flask, request, render_template, g, redirect, Response
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
-
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 #
 # The following is a dummy URI that does not connect to a valid database. You will need to modify it to connect to your Part 2 database in order to use the data.
 #
@@ -41,11 +40,12 @@ engine = create_engine(DATABASEURI)
 # Example of running queries in your database
 # Note that this will probably not work if you already have a table named 'test' in your database, containing meaningful data. This is only an example showing you how to run queries in your database using SQLAlchemy.
 #
+
 engine.execute("""CREATE TABLE IF NOT EXISTS test (
   id serial,
   name text
 );""")
-engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
+#engine.execute("""INSERT INTO test(name, ) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
 
 
 @app.before_request
@@ -109,10 +109,12 @@ def index():
   # example of a database query
   #
   cursor = g.conn.execute("SELECT name FROM test")
+  print(cursor)
   names = []
   for result in cursor:
     names.append(result['name'])  # can also be accessed using result[0]
   cursor.close()
+
 
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -140,8 +142,8 @@ def index():
   #     <div>{{n}}</div>
   #     {% endfor %}
   #
+  #
   context = dict(data = names)
-
 
   #
   # render_template looks in the templates/ folder for files.
@@ -162,13 +164,34 @@ def another():
   return render_template("another.html")
 
 
+@app.route('/rate')
+def rate():
+    return render_template('rate.html')
+
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
 def add():
-  name = request.form['name']
-  g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
-  return redirect('/')
+    name = request.form['name']
+    genre = request.form['genre']
+    mood = request.form['mood']
 
+    user_id = str(int(g.conn.execute('SELECT userid FROM users ORDER BY id DESC LIMIT 1')) + 1)
+
+    g.conn.execute('INSERT INTO users(userid, name, favoritegenre, favoritemood) VALUES (%s, %s, %s, %s)',user_id, name, genre, mood) 
+    g.conn.execute('INSERT INTO users(name) VALUES (%s)', name)
+    g.conn.execute('INSERT INTO users(favoritegenre) VALUES (%s)', genre)
+    g.conn.execute('INSERT INTO users(favoritemood) VALUES (%s)', mood)
+    
+    artists = request.form['artists']
+    artists_list = artists.split(', ')
+    for artist in artists_list:
+        artist_id = g.conn.execute('SELECT artistid FROM artists WHERE name=artist')
+        for i in artist_id:
+            g.conn.execute('INSERT INTO follows(artistid, userid) VALUES (%s, %s),', user_id, artist_id);
+        artist_id.close()
+
+    user_id.close()
+    return redirect('/')
 
 @app.route('/login')
 def login():
@@ -196,7 +219,6 @@ if __name__ == "__main__":
         python server.py --help
 
     """
-
     HOST, PORT = host, port
     print("running on %s:%d" % (HOST, PORT))
     app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
