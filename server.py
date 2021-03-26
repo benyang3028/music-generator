@@ -242,9 +242,38 @@ def showtable():
   context = dict(search=str(category), table=output, fields=fields)
   return render_template("showtable.html", **context)
 
+@app.route('/keywords', methods=['GET', 'POST'])
+def keywords():
+  search = request.form['search']
+
+  query = 'select distinct title, duration, language from (select title, name, duration, language, unnest(keywords) as key from (select * from artists join writes using(artistid)) as a join songs using(songid)) as b where (%s) = key'
+  cursor = g.conn.execute(query, (search,))
+
+  _fields = cursor.keys()
+
+  fields = []
+  for x in _fields:
+    if x not in fields:
+      fields.append(x)
+  
+  output = []
+  for result in cursor:
+    row = ()
+    for f in fields:
+      row += (result[f],)
+
+    output.append(row)
+
+  fields = [(f,) for f in fields]
+  cursor.close()
+  context = dict(search=str(search), table=output, fields=fields)
+  return render_template("keywords.html", **context)
+
 # Example of adding new data to the database
-@app.route('/add', methods=['POST'])
+@app.route('/add', methods=['POST', 'GET'])
 def add():
+    if request.method == 'GET':
+      redirect('/')
     username = request.form["userid"]
     name = request.form["name"]
     genre = request.form["genre"]
@@ -276,24 +305,32 @@ def add():
     mood_dict["chill"] = ["galaxy", "levitating", "study", "life", "sky", "forest", "laugh", "heaven", "blue", "grey", "moonlight", "stars"]
     mood_dict["love"] = ["baby", "bae", "beautiful", "laugh", "love", "pretty", "touch", "lover", "closer", "sin", "babe", "honey", "wish"]
 
-
-    cursor = g.conn.execute("SELECT keywords FROM songs")
     songs = []
+    for key in mood_dict[mood]:
+      cursor = g.conn.execute("SELECT songid, name, title from(select songid, title from (select songid, title, unnest(keywords) as keys from songs group by songid, title) as t1 where keys=%s) as t2 join writes using(songid) join artists using(artistid)", key)
+      
     for result in cursor:
-      songs.append[result[0]]
+      songs.append(result[:])
     cursor.close()
 
-    return redirect('/rate', **context)
+    songs = list(set([i for i in songs]))
+    context = dict(data = songs, username = username)
+    return render_template('add.html', **context)
 
 @app.route('/login')
 def login():
     abort(401)
     this_is_never_executed()
 
-@app.route('/rate')
+@app.route('/rate', methods=['GET', 'POST'])
 def rate():
-    
-    return render_template('rate.html')
+    username = request.form["username"]
+    rating = request.form["rating"]
+    songid = request.form["songid"]
+
+    g.conn.execute('insert into rates(userid, songid, rating) values((%s), (%s), (%s))', username, songid, rating)
+
+    return render_template('success.html')
 
 if __name__ == "__main__":
   import click
