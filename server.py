@@ -161,8 +161,85 @@ def index():
 #
 @app.route('/another')
 def another():
-  return render_template("another.html")
+  cursor = g.conn.execute('SELECT name as artist_name, concert.* FROM ((SELECT artists.*, concertID FROM artists JOIN performs USING(artistid)) as a JOIN concert USING(concertid)) ORDER BY date DESC;')
 
+  _fields = cursor.keys()
+
+  fields = []
+  for x in _fields:
+    if x not in fields and x != "concertid":
+      fields.append(x)
+  
+  output = []
+  for result in cursor:
+    row = ()
+    for f in fields:
+      row += (result[f],)
+
+    output.append(row)
+
+  fields = [(f,) for f in fields]
+  cursor.close()
+  context = dict(table=output, fields=fields)
+  return render_template("another.html", **context)
+
+@app.route('/concert', methods=['GET', 'POST'])
+def concert():
+  search = request.form['search']
+
+  query = 'SELECT name as artist_name, concert.* FROM ((SELECT artists.*, concertID FROM artists JOIN performs USING(artistid)) as a JOIN concert USING(concertid)) WHERE name = (%s) ORDER BY date DESC;'
+  cursor = g.conn.execute(query, (search,))
+
+  _fields = cursor.keys()
+
+  fields = []
+  for x in _fields:
+    if x not in fields and x != "concertid":
+      fields.append(x)
+  
+  output = []
+  for result in cursor:
+    row = ()
+    for f in fields:
+      row += (result[f],)
+
+    output.append(row)
+
+  fields = [(f,) for f in fields]
+  cursor.close()
+  context = dict(search=str(search), table=output, fields=fields)
+  return render_template("concert.html", **context)
+
+@app.route('/showtable', methods=['GET', 'POST'])
+def showtable():
+  category = request.form['showtable']
+
+  if category == 'songs':
+    cursor = g.conn.execute('select title, name, duration, language from (select * from artists join writes using(artistid)) as a join songs using(songid);')
+  elif category == 'albums':
+    cursor = g.conn.execute('select distinct title, name, genre, releasedate from (select albumid, name from (select * from (select * from artists join writes using(artistid)) as a join songs using(songid)) as b join contains using(songid)) as c join album using(albumid)')
+  elif category == 'artists':
+    cursor = g.conn.execute('select name, count(*) as followers FROM artists JOIN follows USING(artistID) GROUP BY artistid, name ORDER BY followers DESC')
+
+  _fields = cursor.keys()
+
+  fields = []
+  for x in _fields:
+    if x not in fields:
+      fields.append(x)
+  
+  output = []
+  for result in cursor:
+    row = ()
+    for f in fields:
+      row += (result[f],)
+
+    output.append(row)
+
+  fields = [(f,) for f in fields]
+  cursor.close()
+  context = dict(search=str(category), table=output, fields=fields)
+  return render_template("showtable.html", **context)
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
@@ -197,6 +274,7 @@ def add():
     mood_dict["happy"] = ["smile", "dance", "crazy", "money", "prosper", "angel", "happy", "happier", "money", "heavier", "heart", "light", "god", "pretty", "bright"]
     mood_dict["chill"] = ["galaxy", "levitating", "study", "life", "sky", "forest", "laugh", "heaven", "blue", "grey", "moonlight", "stars"]
     mood_dict["love"] = ["baby", "bae", "beautiful", "laugh", "love", "pretty", "touch", "lover", "closer", "sin", "babe", "honey", "wish"]
+
 
     cursor = g.conn.execute("SELECT keywords FROM songs")
     songs = []
