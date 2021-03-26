@@ -164,40 +164,44 @@ def another():
   return render_template("another.html")
 
 
-@app.route('/rate')
-def rate():
-    return render_template('rate.html')
-
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
 def add():
-    name = request.form['name']
-    genre = request.form['genre']
-    mood = request.form['mood']
+    username = request.form["userid"]
+    name = request.form["name"]
+    genre = request.form["genre"]
+    mood = request.form["mood"]
 
-    user_id = str(int(g.conn.execute('SELECT userid FROM users ORDER BY id DESC LIMIT 1')) + 1)
+    cursor = g.conn.execute("SELECT userid FROM users")
+    usernames = []
+    for result in cursor:
+      usernames.append(result[0])
+    cursor.close()
 
-    g.conn.execute('INSERT INTO users(userid, name, favoritegenre, favoritemood) VALUES (%s, %s, %s, %s)',user_id, name, genre, mood) 
-    g.conn.execute('INSERT INTO users(name) VALUES (%s)', name)
-    g.conn.execute('INSERT INTO users(favoritegenre) VALUES (%s)', genre)
-    g.conn.execute('INSERT INTO users(favoritemood) VALUES (%s)', mood)
-    
+    if username not in usernames:
+      g.conn.execute('INSERT INTO users(userid, name, favoritegenre, favoritemood) VALUES((%s), (%s), (%s), (%s))', username, name, genre, mood)
+
     artists = request.form['artists']
+
     artists_list = artists.split(', ')
     for artist in artists_list:
-        artist_id = g.conn.execute('SELECT artistid FROM artists WHERE name=artist')
-        for i in artist_id:
-            g.conn.execute('INSERT INTO follows(artistid, userid) VALUES (%s, %s),', user_id, artist_id);
-        artist_id.close()
-
-    user_id.close()
-    return redirect('/')
+        cursor = g.conn.execute("SELECT artistid FROM artists WHERE name = (%s)", artist)
+        a = []
+        for result in cursor:
+          a.append(result[0])
+        g.conn.execute("INSERT INTO follows(userid, artistid) VALUES((%s), (%s))", username, a[0])
+        cursor.close()
+    username.close()
+    return redirect('/rate')
 
 @app.route('/login')
 def login():
     abort(401)
     this_is_never_executed()
 
+@app.route('/rate')
+def rate():
+    return render_template('rate.html')
 
 if __name__ == "__main__":
   import click
