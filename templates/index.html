@@ -23,7 +23,7 @@
       display: inline-block;
     }
     input[type=submit] {
-      background-color: #3b41a8;
+      background-color: #337ab7;
       color: white;
       padding: 12px 20px;
       border: none;
@@ -71,7 +71,7 @@
 
 <body>
   <div class="container">
-    <h1>Music Generator</h1>
+    <h1>Music Recommendation Generator</h1>
     <form method="POST" action="/add">
       <div class="row">
         <div class="col-3">
@@ -133,16 +133,14 @@
     </form>
   </div>
 
-  <div class="container"><a href="another" class="btn btn-primary btn-lg" role="button">See all available concerts</a></div>
-  <div class="container"><a href="ratinghome" class="btn btn-primary btn-lg" role="button">Rate a Song</a></div>
-
+  <div class="container">
+    <a href="another" class="btn btn-primary btn-lg" role="button">See all available concerts</a>
+    <a href="ratinghome" class="btn btn-primary btn-lg" role="button">Rate a Song</a>
+  </div>
 
   <div class="container">
-
+    <h3>I want to see all:</h3>
     <form method="POST" action="/showtable">
-        <div class="col-3">
-          <h4>I want to see all:</h4>
-        </div>
         <div class="row" style="margin-top:10px;">
           <select id="showtable" name="showtable" required>
             <option value="" disabled selected>select category</option>
@@ -152,7 +150,7 @@
           </select>
         </div>
         <div class="row" style="margin-top:10px;">
-          <input type="submit" value="Generate">
+          <input type="submit" value="Show">
         </div>
     </form>
   </div>
@@ -160,13 +158,18 @@
   <div class="container">
 
     <form method="POST" action="/keywords">
-        <p>Search for Songs by a keyword: 
-        <input type="text" name="search" required> 
-        <input type="submit" value="Search">
-        </p>
+        <h3>Search for Songs by a keyword:</h3>
+        <div class="row" style="margin-top:10px;">
+          <input type="text" name="search" required>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <input type="submit" value="Search">
+        </div>
+        
     </form>
 
-</div>
+  </div>
+
 
 
 

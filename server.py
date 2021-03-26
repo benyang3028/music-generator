@@ -215,9 +215,9 @@ def showtable():
   category = request.form['showtable']
 
   if category == 'songs':
-    cursor = g.conn.execute('select title, name, duration, language from (select * from artists join writes using(artistid)) as a join songs using(songid);')
+    cursor = g.conn.execute('select title, array_agg(name) as artists, duration, language from (select * from artists join writes using(artistid)) as a join songs using(songid) group by title, duration, language order by title asc')
   elif category == 'albums':
-    cursor = g.conn.execute('select distinct title, name, genre, releasedate from (select albumid, name from (select * from (select * from artists join writes using(artistid)) as a join songs using(songid)) as b join contains using(songid)) as c join album using(albumid)')
+    cursor = g.conn.execute('select title, artist[1], genre, releasedate from (select distinct title, array_agg(name) as artist, genre, releasedate from (select albumid, name from (select * from (select * from artists join writes using(artistid)) as a join songs using(songid)) as b join contains using(songid)) as c join album using(albumid) group by title, genre, releasedate) as d')
   elif category == 'artists':
     cursor = g.conn.execute('select name, count(*) as followers FROM artists JOIN follows USING(artistID) GROUP BY artistid, name ORDER BY followers DESC')
 
@@ -241,6 +241,31 @@ def showtable():
   cursor.close()
   context = dict(search=str(category), table=output, fields=fields)
   return render_template("showtable.html", **context)
+
+@app.route('/ratinghome', methods=['GET', 'POST'])
+def ratinghome():
+  cursor = g.conn.execute('select songid, title, array_agg(name) as artists, duration, language from (select * from artists join writes using(artistid)) as a join songs using(songid) group by songid, title, duration, language order by title asc')
+  
+  _fields = cursor.keys()
+
+  fields = []
+  for x in _fields:
+    if x not in fields:
+      fields.append(x)
+  
+  output = []
+  for result in cursor:
+    row = ()
+    for f in fields:
+      row += (result[f],)
+
+    output.append(row)
+
+  fields = [(f,) for f in fields]
+
+  cursor.close()
+  context = dict(table=output, fields=fields)
+  return render_template("ratinghome.html", **context)
 
 @app.route('/keywords', methods=['GET', 'POST'])
 def keywords():
@@ -327,6 +352,24 @@ def rate():
     username = request.form["username"]
     rating = request.form["rating"]
     songid = request.form["songid"]
+
+    cursor = g.conn.execute("SELECT userid FROM users")
+    usernames = []
+    for result in cursor:
+      usernames.append(result[0])
+    cursor.close()
+
+    if username not in usernames:
+      return render_template('fail.html')
+
+    cursor = g.conn.execute("SELECT songid from songs")
+    songs = []
+    for result in cursor:
+      songs.append(result[0])
+    cursor.close()
+
+    if songid not in songs:
+      return render_template('fail.html')
 
     g.conn.execute('insert into rates(userid, songid, rating) values((%s), (%s), (%s))', username, songid, rating)
 

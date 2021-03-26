@@ -1,0 +1,105 @@
+<style>
+    body{ 
+      font-size: 15pt;
+      font-family: 'Lucida Console';
+    }
+    h1{
+      font-family: 'Courier New', monospace;
+    } 
+    input[type=text], select, textarea {
+      font-family: 'Courier New', monospace;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+
+      resize: vertical;
+    }
+    label {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      padding: 12px 12px 12px 0;
+      display: inline-block;
+    }
+    input[type=submit] {
+      background-color: #3b41a8;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      float: right;
+    }
+    input[type=submit]:hover {
+      opacity: .5;
+    }
+
+    .container {
+      border-radius: 5px;
+      background-color: white;
+      padding: 20px;
+    }
+    .col-3 {
+      float: left;
+      width: 25%;
+      margin-top: 6px;
+    }
+    .col-9 {
+      float: left;
+      width: 75%;
+      margin-top: 6px;
+    }
+  /* Clear floats after the columns */
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+  /* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+  @media screen and (max-width: 600px) {
+    .col-25, .col-75, input[type=submit] {
+      width: 100%;
+      margin-top: 0;
+    }
+  }
+  </style>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<div class="container">
+    <h2>Make a rating:</h2>
+    <form method="POST" action="/rate">
+        <input type="text" id="username" name="username" placeholder="Verify your username:" required>
+        <input type="text" id="songid" name="songid" placeholder="Input the songid:" required>
+        <input type="text" id="rating" name="rating" placeholder="Rate the song from 1-5" required>
+        <input type="submit" value="Rate this Song!">
+    </form>
+</div>
+
+<div class="col-sm-8 text-left">
+    <table class="table">
+        {% for f in fields %}
+        <td>
+            {% for x in f %}
+                <b>{{x}}</b>
+            {% endfor %}
+        </td>
+        {% endfor %}
+    
+        {% for t in table %}
+        <tr>
+            {% for x in t %}
+                <td>
+                    {{x}}
+                </td>
+            {% endfor %}
+            <td></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="/" class="btn btn-primary btn-lg" role="button">Homepage</a>
+</div>
+
