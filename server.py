@@ -198,7 +198,12 @@ def add():
     mood_dict["chill"] = ["galaxy", "levitating", "study", "life", "sky", "forest", "laugh", "heaven", "blue", "grey", "moonlight", "stars"]
     mood_dict["love"] = ["baby", "bae", "beautiful", "laugh", "love", "pretty", "touch", "lover", "closer", "sin", "babe", "honey", "wish"]
 
-    cursor = g.conn.execute("SELECT artistid, songs, duration FROM songs NATURAL JOIN = (%s)", artist)
+    cursor = g.conn.execute("SELECT keywords[:] FROM songs")
+    songs = []
+    for result in cursor:
+      songs.append[result[0]]
+    cursor.close()
+
     return redirect('/rate', **context)
 
 @app.route('/login')
