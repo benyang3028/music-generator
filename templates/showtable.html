@@ -70,14 +70,14 @@
 
 
 
-<div class="container-fluid"><h1>Upcoming Concerts:</h1>
+<div class="container-fluid"><h1>Showing all {{search}}:</h1>
 
     <form method="POST" action="/showtable">
         <div class="col-3">
           <text>I want to see all </text>
         </div>
         <div class="row" style="margin-top:10px;">
-          <select id="showtable" name="showtable">
+          <select id="showtable" name="showtable" required>
             <option value="" disabled selected>select category</option>
             <option value="songs">songs</option>
             <option value="albums">albums</option>

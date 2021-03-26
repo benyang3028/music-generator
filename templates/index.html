@@ -78,7 +78,7 @@
           <label for="username">Username</label>
         </div>
         <div class="col-9">
-          <input type="text" id="userid" name="userid" placeholder="Your username..." >
+          <input type="text" id="userid" name="userid" placeholder="Your username..." required>
         </div>
       </div>
       <div class="row">
@@ -86,7 +86,7 @@
           <label for="fname">Name</label>
         </div>
         <div class="col-9">
-          <input type="text" id="name" name="name" placeholder="Your name...">
+          <input type="text" id="name" name="name" placeholder="Your name..." required>
         </div>
       </div>
       <div class="row">
@@ -94,7 +94,7 @@
           <label for="lname">Genre</label>
         </div>
         <div class="col-9">
-          <select id="genre" name="genre">
+          <select id="genre" name="genre" required>
             <option value="" disabled selected>Select your favorite genre</option>
             <option value="rap">rap</option>
             <option value="pop">pop</option>
@@ -110,7 +110,7 @@
           <label for="country">Mood</label>
         </div>
         <div class="col-9">
-          <select id="mood" name="mood">
+          <select id="mood" name="mood" required>
             <option value="" disabled selected>Select your favorite mood of music</option>
             <option value="happy">happy</option>
             <option value="sad">sad</option>
@@ -124,7 +124,7 @@
           <label for="subject">Artists</label>
         </div>
         <div class="col-9">
-          <textarea id="artists" name="artists" placeholder="List your favorite artists separated by ', ' ..." style="height:120px"></textarea>
+          <textarea id="artists" name="artists" placeholder="List your favorite artists separated by ', ' ..." style="height:120px"></textarea required>
         </div>
       </div>
       <div class="row" style="margin-top:10px;">
@@ -142,7 +142,7 @@
           <h4>I want to see all:</h4>
         </div>
         <div class="row" style="margin-top:10px;">
-          <select id="showtable" name="showtable">
+          <select id="showtable" name="showtable" required>
             <option value="" disabled selected>select category</option>
             <option value="songs">songs</option>
             <option value="albums">albums</option>

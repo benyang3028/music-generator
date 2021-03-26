@@ -237,6 +237,7 @@ def showtable():
     output.append(row)
 
   fields = [(f,) for f in fields]
+
   cursor.close()
   context = dict(search=str(category), table=output, fields=fields)
   return render_template("showtable.html", **context)
