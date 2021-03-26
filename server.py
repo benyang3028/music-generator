@@ -189,10 +189,17 @@ def add():
         a = []
         for result in cursor:
           a.append(result[0])
-        g.conn.execute("INSERT INTO follows(userid, artistid) VALUES((%s), (%s))", username, a[0])
         cursor.close()
-    username.close()
-    return redirect('/rate')
+        g.conn.execute("INSERT INTO follows(userid, artistid) VALUES((%s), (%s))", username, a[0])
+
+    mood_dict = dict()
+    mood_dict["sad"] = ["pain", "rain", "hate", "break", "wasted", "sorry", "bottle", "sad", "die", "paranoid", "rain", "tears", "teardrops", "bleeding", "wishing", "well", "scar", "alone"]
+    mood_dict["happy"] = ["smile", "dance", "crazy", "money", "prosper", "angel", "happy", "happier", "money", "heavier", "heart", "light", "god", "pretty", "bright"]
+    mood_dict["chill"] = ["galaxy", "levitating", "study", "life", "sky", "forest", "laugh", "heaven", "blue", "grey", "moonlight", "stars"]
+    mood_dict["love"] = ["baby", "bae", "beautiful", "laugh", "love", "pretty", "touch", "lover", "closer", "sin", "babe", "honey", "wish"]
+
+    cursor = g.conn.execute("SELECT artistid, songs, duration FROM songs NATURAL JOIN = (%s)", artist)
+    return redirect('/rate', **context)
 
 @app.route('/login')
 def login():
@@ -201,6 +208,7 @@ def login():
 
 @app.route('/rate')
 def rate():
+    
     return render_template('rate.html')
 
 if __name__ == "__main__":
