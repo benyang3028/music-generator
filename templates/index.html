@@ -65,6 +65,9 @@
     }
   }
   </style>
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
 <body>
   <div class="container">
@@ -130,6 +133,29 @@
     </form>
   </div>
 
-  <p><a href="another">See available concerts</a></p>
+  <div class="container"><a href="another" class="btn btn-primary btn-lg" role="button">See all available concerts</a></div>
+
+  <div class="container">
+
+    <form method="POST" action="/showtable">
+        <div class="col-3">
+          <h4>I want to see all:</h4>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <select id="showtable" name="showtable">
+            <option value="" disabled selected>select category</option>
+            <option value="songs">songs</option>
+            <option value="albums">albums</option>
+            <option value="artists">artists</option>
+          </select>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <input type="submit" value="Generate">
+        </div>
+    </form>
+  </div>
+
+
+
 </body>
 </html>
