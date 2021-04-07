@@ -316,6 +316,7 @@ def add():
 
     artists = request.form['artists']
 
+    albums = []
     artists_list = artists.split(', ')
     for artist in artists_list:
         cursor = g.conn.execute("SELECT artistid FROM artists WHERE name = (%s)", artist)
@@ -323,7 +324,13 @@ def add():
         for result in cursor:
           a.append(result[0])
         cursor.close()
-        g.conn.execute("INSERT INTO follows(userid, artistid) VALUES((%s), (%s))", username, a[0])
+        if a:
+          g.conn.execute("INSERT INTO follows(userid, artistid) VALUES((%s), (%s))", username, a[0])
+          cursor = g.conn.execute("SELECT title, releasedate, awards FROM(SELECT * from album NATURAL JOIN releases NATURAL JOIN artists WHERE artistid = %s) as a", a[0])
+          for result in cursor:
+            albums.append(result[:])
+          cursor.close()
+    
 
     mood_dict = dict()
     mood_dict["sad"] = ["pain", "rain", "hate", "break", "wasted", "sorry", "bottle", "sad", "die", "paranoid", "rain", "tears", "teardrops", "bleeding", "wishing", "well", "scar", "alone"]
@@ -336,13 +343,12 @@ def add():
       cursor = g.conn.execute("SELECT songid, name, title from(select songid, title from (select songid, title, unnest(keywords) as keys from songs group by songid, title) as t1 where keys=%s) as t2 join writes using(songid) join artists using(artistid)", key)
       for result in cursor:
         songs.append(result[:])
-      
+
     cursor.close()
     songs = list(set([i for i in songs]))
     random_num = random.randint(0, len(songs)-1)
 
-    context = dict(data=songs[random_num], username = username)
-
+    context = dict(data=songs[random_num], username = username, albums = albums)
     return render_template('add.html', **context)
 
 @app.route('/login')

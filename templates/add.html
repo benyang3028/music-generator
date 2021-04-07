@@ -40,8 +40,23 @@
             </tr>
         </table>
         <input type="submit" value="Submit">
-    </form> 
-
+    </form>
+</div>
+<h2>Check out these albums from your favorite artists</h2>
+    <div class="col-sm-8 text-left">
+        <table class="table">
+        {% for a in albums %}
+        <tr>
+            <td>{{a[0]}}</td>
+            <td>{{a[1]}}</td>
+            <td>
+                {% for b in a[2] %}
+                <p> {{b}} </p></br>
+                {% endfor %}
+            </td>
+        <tr>
+        {% endfor %}
+        </table>
 </div>
 </body>
 </html>
