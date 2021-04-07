@@ -20,28 +20,24 @@
 <div class="col-sm-8 text-left">
     <form method="POST" action="/rate">
         <table class="table">
-        
             <th>Recommended for:
-                <select id="username" name ="username" required>
+                <select id="username" name = "username" required>
                     <option value={{username}} selected>  {{username}}  </option>
                 </select>
             </th>
-            
-            {% for n in data %}
             <tr>
                 <td>
-                    {{n[1]}}: {{n[2]}}
+                    {{data[1]}}: {{data[2]}}
                 </td>
                 <td>
                     <input type="text" id="rating" name="rating" placeholder="Rate the song from 1-5" required>
                 </td>
                 <td>
                     <select id="songid" name="songid" required>
-                        <option value={{n[0]}} selected>{{n[0]}}</option>
-                        </select>
+                        <option value={{data[0]}} selected>{{data[0]}}</option>
+                    </select>
                 </td>
             </tr>
-            {% endfor %}
         </table>
         <input type="submit" value="Submit">
     </form> 
