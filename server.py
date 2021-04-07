@@ -330,7 +330,6 @@ def add():
           for result in cursor:
             albums.append(result[:])
           cursor.close()
-    
 
     mood_dict = dict()
     mood_dict["sad"] = ["pain", "rain", "hate", "break", "wasted", "sorry", "bottle", "sad", "die", "paranoid", "rain", "tears", "teardrops", "bleeding", "wishing", "well", "scar", "alone"]
