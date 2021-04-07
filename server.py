@@ -9,6 +9,7 @@ Read about it online.
 """
 import os
   # accessible as a variable in index.html:
+import random
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
@@ -333,13 +334,15 @@ def add():
     songs = []
     for key in mood_dict[mood]:
       cursor = g.conn.execute("SELECT songid, name, title from(select songid, title from (select songid, title, unnest(keywords) as keys from songs group by songid, title) as t1 where keys=%s) as t2 join writes using(songid) join artists using(artistid)", key)
+      for result in cursor:
+        songs.append(result[:])
       
-    for result in cursor:
-      songs.append(result[:])
     cursor.close()
-
     songs = list(set([i for i in songs]))
-    context = dict(data = songs, username = username)
+    random_num = random.randint(0, len(songs)-1)
+
+    context = dict(data=songs[random_num], username = username)
+
     return render_template('add.html', **context)
 
 @app.route('/login')
